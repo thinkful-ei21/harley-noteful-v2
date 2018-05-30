@@ -36,10 +36,13 @@ router.get('/', (req, res, next) => {
 router.get('/:id', (req, res, next) => {
   const id = req.params.id;
 
-  notes.find(id)
-    .then(item => {
-      if (item) {
-        res.json(item);
+  knex
+    .select('id', 'title', 'content')
+    .from('notes')
+    .where('notes.id', id)
+    .then(items => {
+      if (items[0]) {
+        res.json(items[0]);
       } else {
         next();
       }
