@@ -73,10 +73,13 @@ router.put('/:id', (req, res, next) => {
     return next(err);
   }
 
-  notes.update(id, updateObj)
-    .then(item => {
-      if (item) {
-        res.json(item);
+  knex('notes')
+    .where('notes.id', id)
+    .update(updateObj)
+    .returning(['notes.id', 'title', 'content'])
+    .then(items => {
+      if (items[0]) {
+        res.json(items[0]);
       } else {
         next();
       }
