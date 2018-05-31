@@ -43,8 +43,9 @@ router.get('/:id', (req, res, next) => {
   const id = req.params.id;
 
   knex
-    .select('notes.id', 'title', 'content')
+    .select('notes.id', 'title', 'content', 'folders.id as folderId', 'folders.name as folderName')
     .from('notes')
+    .leftJoin('folders', 'notes.folder_id', 'folders.id')
     .where('notes.id', id)
     .then(items => {
       if (items[0]) {
