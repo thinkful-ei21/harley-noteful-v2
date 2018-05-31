@@ -16,7 +16,7 @@ const knex = require('../knex');
 router.get('/', (req, res, next) => {
   const { searchTerm } = req.query;
 
-  knex.select('id', 'title', 'content')
+  knex.select('notes.id', 'title', 'content')
     .from('notes')
     .modify(function (queryBuilder) {
       if (searchTerm) {
@@ -37,7 +37,7 @@ router.get('/:id', (req, res, next) => {
   const id = req.params.id;
 
   knex
-    .select('id', 'title', 'content')
+    .select('notes.id', 'title', 'content')
     .from('notes')
     .where('notes.id', id)
     .then(items => {
@@ -101,10 +101,12 @@ router.post('/', (req, res, next) => {
     return next(err);
   }
 
-  notes.create(newItem)
-    .then(item => {
-      if (item) {
-        res.location(`http://${req.headers.host}/notes/${item.id}`).status(201).json(item);
+  knex('notes')
+    .insert(newItem)
+    .returning(['notes.id', 'title', 'content'])
+    .then(items => {
+      if (items[0]) {
+        res.location(`http://${req.headers.host}/notes/${items[0].id}`).status(201).json(items[0]);
       }
     })
     .catch(err => {
