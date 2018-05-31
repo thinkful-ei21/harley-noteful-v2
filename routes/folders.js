@@ -33,4 +33,34 @@ router.get('/:id', (req, res, next) => {
     });
 });
 
+router.put('/:id', (req, res, next) => {
+  const id = req.params.id;
+  
+  /***** Never trust users - validate input *****/
+  const updateObj = {};
+  console.log(req.body);
+  if ('name' in req.body) {
+    updateObj['name'] = req.body.name;
+  } else {
+    const err = new Error('Missing `name` in request body');
+    err.status = 400;
+    return next(err); 
+  }
+  
+  knex('folders')
+    .where('folders.id', id)
+    .update(updateObj)
+    .returning(['folders.id', 'name'])
+    .then(items => {
+      if (items[0]) {
+        res.json(items[0]);
+      } else {
+        next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
 module.exports = router;
