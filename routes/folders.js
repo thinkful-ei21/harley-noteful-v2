@@ -5,7 +5,6 @@ const knex = require('../knex');
 const router = express.Router();
 
 router.get('/', (req, res, next) => {
-  console.log('made it into the router');
   knex.select('id', 'name')
     .from('folders')
     .then(results => {
@@ -38,7 +37,6 @@ router.put('/:id', (req, res, next) => {
   
   /***** Never trust users - validate input *****/
   const updateObj = {};
-  console.log(req.body);
   if ('name' in req.body) {
     updateObj['name'] = req.body.name;
   } else {
@@ -56,6 +54,30 @@ router.put('/:id', (req, res, next) => {
         res.json(items[0]);
       } else {
         next();
+      }
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
+router.post('/', (req, res, next) => {
+  const { name } = req.body;
+  
+  const newItem = { name };
+  /***** Never trust users - validate input *****/
+  if (!newItem.name) {
+    const err = new Error('Missing `title` in request body');
+    err.status = 400;
+    return next(err);
+  }
+  
+  knex('folders')
+    .insert(newItem)
+    .returning(['folders.id', 'name'])
+    .then(items => {
+      if (items[0]) {
+        res.location(`http://${req.headers.host}/notes/${items[0].id}`).status(201).json(items[0]);
       }
     })
     .catch(err => {
