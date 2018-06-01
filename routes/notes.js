@@ -78,8 +78,11 @@ router.put('/:id', (req, res, next) => {
   const id = req.params.id;
 
   const { title, content, folderId, tags } = req.body;
-
-  const updateObj = { title, content, folder_id: folderId };
+  //console.log(`folder id's type is ${typeof folderId}`);
+  const updateObj = { title, content };
+  if (folderId !== '') {
+    updateObj.folder_id = folderId;
+  }
   /***** Never trust users - validate input *****/
   if (!updateObj.title) {
     const err = new Error('Missing `title` in request body');
@@ -126,8 +129,11 @@ router.put('/:id', (req, res, next) => {
 // Post (insert) an item
 router.post('/', (req, res, next) => {
   const { title, content, folderId, tags } = req.body;
-
-  const newItem = { title, content, folder_id: folderId };
+  //console.log(`folder id's type is ${typeof folderId}`);
+  const newItem = { title, content };
+  if (folderId !== '') {
+    newItem.folder_id = folderId;
+  }
   /***** Never trust users - validate input *****/
   if (!newItem.title) {
     const err = new Error('Missing `title` in request body');
