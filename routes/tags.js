@@ -85,4 +85,18 @@ router.post('/', (req, res, next) => {
     });
 });
 
+router.delete('/:id', (req, res, next) => {
+  const id = req.params.id;
+    
+  knex('tags')
+    .where('tags.id', id)
+    .del()
+    .then(() => {
+      res.sendStatus(204);
+    })
+    .catch(err => {
+      next(err);
+    });
+});
+
 module.exports = router;
