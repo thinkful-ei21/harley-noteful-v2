@@ -67,7 +67,7 @@ router.post('/', (req, res, next) => {
   const newItem = { name };
   /***** Never trust users - validate input *****/
   if (!newItem.name) {
-    const err = new Error('Missing `title` in request body');
+    const err = new Error('Missing `name` in request body');
     err.status = 400;
     return next(err);
   }
